@@ -39,7 +39,11 @@ public class Main {
             Scanner tc = new Scanner(System.in);
             System.out.print("Introduce la contraseña: ");
             String pass = tc.nextLine();
-
+            if(contraseñaCorrecta(user,pass)){
+                System.out.println("Bienvenido, usuario: "+user);
+            }else{
+                System.out.println("Contraseña incorrecta.");
+            }
         }
     }
 
@@ -48,12 +52,24 @@ public class Main {
         String user,pass;
         System.out.print("Dime el nombre de usuario que quieres: ");
         user = tc.nextLine();
+
+        while(user.contains(" ")){
+            System.out.println("Nombre de usuario no válido, introduzcalo de nuevo");
+            user = tc.nextLine();
+        }
+
         if(usuarioExiste(user)){
             System.out.println("Usuario "+user+" ,elige otro nombre de usuario");
             registrarse();
         }else{
             System.out.print("Elige una contraseña: ");
             pass = tc.nextLine();
+
+            while(pass.contains(" ")){
+                System.out.println("contraseña no válida, introduzcala de nuevo");
+                pass = tc.nextLine();
+            }
+
             crearUsuario(user,pass);
             System.out.println("Usuario creado con éxito");
         }
@@ -69,6 +85,16 @@ public class Main {
         Statement st = con.createStatement();
         ResultSet existe = st.executeQuery(String.format("SELECT CASE WHEN EXISTS (SELECT 2 FROM usuario WHERE nombre = '%s') THEN 1 ELSE 0 END AS existe;",user));
         if(existe.getInt(1)==1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    private static boolean contraseñaCorrecta(String user,String pass) throws SQLException{
+        Statement st = con.createStatement();
+        ResultSet passCorrecta = st.executeQuery(String.format("select pass from usuario where nombre = '%s';",user));
+        if(passCorrecta.getString(1).equals(pass)){
             return true;
         }else{
             return false;
